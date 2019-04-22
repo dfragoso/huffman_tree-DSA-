@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "huffman_tree.h"
 
 bool huffman_tree::isLeaf(Node* root) const {
@@ -9,22 +10,13 @@ bool huffman_tree::isLeaf(Node* root) const {
 	}
 }
 
-std::string huffman_tree::getCharCode(char c) const {
-	if (theHuffmanCode.find(c) != theHuffmanCode.end()) {
-		return theHuffmanCode.at(c);
-	}
-	else {
-		return "";
-	}
-}
-
-huffman_tree::huffman_tree(const std::string &file_name) {
-	char superChar;
+huffman_tree::huffman_tree(const std::string &file_name) {	
+	char superChar; 
 	std::unordered_map<char, int> frequencies;
 	std::vector<Node*> treeNodes;
-	std::ifstream file(file_name);
+	std::ifstream file (file_name);	
 	if (file.is_open()) {
-		while (true) {
+		while (true) {			
 			file.get(superChar);
 			if (file.eof()) {
 				break;
@@ -37,7 +29,7 @@ huffman_tree::huffman_tree(const std::string &file_name) {
 				Node* temp = new Node();
 				temp->nodeChar = superChar;
 				treeNodes.push_back(temp);
-			}
+			}			
 		}
 	}
 
@@ -52,14 +44,14 @@ huffman_tree::huffman_tree(const std::string &file_name) {
 		return;
 	}
 	else {
-		buildHuffmanTable(root, "", theHuffmanCode);
+		buildHuffmanTable(root, "" , theHuffmanCode);
 	}
 	std::cout << "The huffman code of each character in the tree:" << std::endl;
 	for (auto i : theHuffmanCode)
-		std::cout << i.first << " " << i.second << std::endl;
+		std::cout << i.first << " " << i.second << std::endl;	
 }
 
-huffman_tree::Node* huffman_tree::buildTree(std::vector<Node*> &treeNodes)const {
+huffman_tree:: Node* huffman_tree::buildTree(std::vector<Node*> &treeNodes)const {
 	std::priority_queue<Node*, std::vector<Node*>, compareFreq> priorityQ;
 	for (int i = 0; i < treeNodes.size(); i++) {
 		priorityQ.push(treeNodes[i]);
@@ -82,21 +74,24 @@ huffman_tree::Node* huffman_tree::buildTree(std::vector<Node*> &treeNodes)const 
 		}
 		else {
 			return priorityQ.top();
-		}
+		}		
 	}
 	return priorityQ.top();
 }
+
+/*Big tree*/
 huffman_tree::~huffman_tree() {
 	delete root;
+	root = nullptr;
 }
 
-void huffman_tree::buildHuffmanTable(Node* head, std::string code, std::unordered_map<char, std::string > &table) const {
+void huffman_tree::buildHuffmanTable (Node* head, std::string code, std::unordered_map<char, std::string > &table) const {
 	std::string charSequence = code;
 	if (head == nullptr) {
 		return;
-	}
+	}	
 	if (isLeaf(head)) {
-		table.emplace(head->nodeChar, charSequence);
+		table.emplace(head->nodeChar, charSequence);		
 	}
 	if (head->leftChild != nullptr) {
 		buildHuffmanTable(head->leftChild, charSequence += '0', table);
@@ -110,12 +105,11 @@ void huffman_tree::buildHuffmanTable(Node* head, std::string code, std::unordere
 
 //:)
 std::string huffman_tree::get_character_code(char character) const {
-	std::string bSequence = getCharCode(character);
-	if (bSequence == "") {
-		return "";
+	if (theHuffmanCode.find(character) != theHuffmanCode.end()) {
+		return theHuffmanCode.at(character);
 	}
 	else {
-		return bSequence;
+		return "";
 	}
 }
 
@@ -134,7 +128,7 @@ std::string huffman_tree::encode(const std::string &file_name) const {
 			if (file.eof()) {
 				break;
 			}
-			translation += getCharCode(c);
+			translation += get_character_code(c);
 			if (translation == "") {
 				return "";
 			}
@@ -151,16 +145,16 @@ std::string huffman_tree::decode(const std::string &string_to_decode) const {
 	std::string plainText;
 	Node* temp = root;
 	int i = 0;
-	if (string_to_decode.size() == 0) {
+	if (string_to_decode.size()==0) {
 		return "";
 	}
-	if (root == nullptr) {
+	if (root == nullptr){
 		return "";
 	}
 	if (isLeaf(root) && (string_to_decode.size() > 1 || string_to_decode != "1")) {
 		return "";
 	}
-
+	
 	while (i < string_to_decode.size()) {
 		if (string_to_decode[i] == '0') {
 			if (isLeaf(temp)) {
@@ -175,7 +169,7 @@ std::string huffman_tree::decode(const std::string &string_to_decode) const {
 				}
 			}
 		}
-		else if (string_to_decode[i] == '1') {
+		else if(string_to_decode[i] == '1') {
 			if (isLeaf(temp)) {
 				plainText += temp->nodeChar;
 				temp = root;
