@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "huffman_tree.h"
 
 bool huffman_tree::isLeaf(Node* root) const {
